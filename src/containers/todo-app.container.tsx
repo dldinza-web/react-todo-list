@@ -2,18 +2,20 @@ import React, { Component } from "react";
 import { ALL_TODOS, ACTIVE_TODOS, COMPLETED_TODOS, ENTER_KEY } from "../core/constants";
 import TodoItemComponent from "../components/todo-item.component";
 import FooterContainer from "./footer.container";
+import TodoListModel from "../models/todo-list.model";
 
 declare var Router : any;
 
-export default class ToDoAppContainer extends Component<IAppProps, IAppState> {
+export default class ToDoAppContainer extends Component<{}, IAppState> {
   private refInputField :any
 
-  constructor(props :IAppProps) {
+  constructor(props: any) {
     super(props)
 
     this.state = {
       nowShowing: ALL_TODOS,
-      editing: null
+      editing: null,
+      todoList: new TodoListModel('react-todos')
     }
 
     this.refInputField = React.createRef();
@@ -23,9 +25,9 @@ export default class ToDoAppContainer extends Component<IAppProps, IAppState> {
     let setState = this.setState
 
     let router = Router({
-      '/':            setState.bind(this, { nowShowing: ALL_TODOS }),
-      '/active':      setState.bind(this, { nowShowing: ACTIVE_TODOS }),
-      '/completed':   setState.bind(this, { nowShowing: COMPLETED_TODOS })
+      '/':            setState.bind(this, { ...this.state, nowShowing: ALL_TODOS }),
+      '/active':      setState.bind(this, { ...this.state, nowShowing: ACTIVE_TODOS }),
+      '/completed':   setState.bind(this, { ...this.state, nowShowing: COMPLETED_TODOS })
     })
 
     router.init('/')
@@ -39,43 +41,60 @@ export default class ToDoAppContainer extends Component<IAppProps, IAppState> {
     let value = this.refInputField.current.value.trim()
 
     if (value) {
-      this.props.todoList.addTodo(value)
+      this.state.todoList.addTodo(value)
       this.refInputField.current.value = ''
+
+      this.refreshState()
     }
   }
 
+  shouldComponentUpdate(nextProps: any, nextState: any) {
+    return nextProps !== this.props || nextState !== this.state
+  }
+
+  private refreshState(attibutes :Object = {}) {
+    this.setState({ ...this.state, ...attibutes })
+  }
+
   public toggleAll(event :any) {
-    this.props.todoList.toggleAll(event.target.checked)
+    this.state.todoList.toggleAll(event.target.checked)
   }
 
   public toggle(todoToToggle :ITodoItem) {
-    this.props.todoList.toggle(todoToToggle)
+    this.state.todoList.toggle(todoToToggle)
+
+    this.refreshState()
   }
 
   public destroy(todoToDestroy :ITodoItem) {
-    this.props.todoList.destroy(todoToDestroy)
+    this.state.todoList.destroy(todoToDestroy)
+
+    this.refreshState()
   }
 
   public edit(todoToEdit :ITodoItem) {
-    this.setState({ editing: todoToEdit.id })
+    this.refreshState({ editing: todoToEdit.id })
   }
 
   public save(todoToSave :ITodoItem, title :string) {
-    this.props.todoList.save(todoToSave, title)
-    this.setState({ editing: null })
+    this.state.todoList.save(todoToSave, title)
+
+    this.refreshState({ editing: null })
   }
 
   public cancel() {
-    this.setState({ editing: null })
+    this.refreshState({ editing: null })
   }
 
   public clearCompleted() {
-    this.props.todoList.clearCompleted()
+    this.state.todoList.clearCompleted()
+
+    this.refreshState()
   }
 
 
   render() {
-    let todos = this.props.todoList.todos;
+    let todos = this.state.todoList.todos;
 
     let todoItems = todos.filter( (todo) => {
       switch (this.state.nowShowing) {

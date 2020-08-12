@@ -25,7 +25,7 @@ export default class TodoItemComponent extends Component<ITodoItemProps, ITodoIt
   public componentDidUpdate(prevProps : any) {
     if (!prevProps.editing && this.props.editing) {
       this.refInputField.current.focus()
-      this.refInputField.current.setSelectionRange(this.refInputField.value.length, this.refInputField.value.length)
+      this.refInputField.current.setSelectionRange(0, this.refInputField.current.value.length)
     }
   }
 
@@ -81,6 +81,7 @@ export default class TodoItemComponent extends Component<ITodoItemProps, ITodoIt
           ref={this.refInputField}
           className="edit"
           value={this.state.itemTitle}
+
           onBlur={ e => this.handleSubmit(e) }
           onChange={ e => this.handleChange(e) }
           onKeyDown={ e => this.handleKeyDown(e) }

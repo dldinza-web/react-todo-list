@@ -34,10 +34,10 @@ interface ITodoFooterProps {
 interface ITodoList {
   key: any
   todos: Array<ITodoItem>
-  onChanges: Array<any>
+  //onChanges: Array<any>
 
-  subscribe(onChange)
-  inform()
+  //subscribe(onChange)
+  updateStore()
   addTodo(title :string)
   toggleAll(checked :boolean)
   toggle(todoToToggle)
@@ -54,5 +54,6 @@ interface IAppProps {
 
 interface IAppState {
   editing? :string | null,
-  nowShowing :string
+  nowShowing :string,
+  todoList :ITodoList
 }

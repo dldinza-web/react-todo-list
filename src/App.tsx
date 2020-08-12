@@ -5,12 +5,8 @@ import TodoListModel from './models/todo-list.model';
 
 export default class App extends Component {
   render() {
-    let todoList = new TodoListModel('react-todos')
-
     return (
-      <ToDoAppContainer
-        todoList={todoList}
-      />
+      <ToDoAppContainer />
     )
   }
 }
